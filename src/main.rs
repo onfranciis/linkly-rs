@@ -1,12 +1,13 @@
 #[macro_use]
 extern crate rocket;
+mod controllers;
 
 #[get("/")]
 fn index() -> &'static str {
-    "Hello, world!"
+    "Connected!"
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![index])
+    rocket::build().mount("/", routes![index, controllers::get_all_url::index])
 }
