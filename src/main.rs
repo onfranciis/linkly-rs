@@ -10,7 +10,11 @@ fn rocket() -> _ {
     rocket::build()
         .mount(
             "/",
-            routes![catchers::catchers::index, controllers::get_all_url::index],
+            routes![
+                catchers::catchers::index,
+                controllers::get_all_url::index,
+                controllers::add_new_url::index
+            ],
         )
         .register(
             "/",
