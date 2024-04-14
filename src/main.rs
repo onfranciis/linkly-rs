@@ -3,6 +3,7 @@ extern crate rocket;
 
 mod catchers;
 mod controllers;
+mod util;
 
 #[launch]
 fn rocket() -> _ {
