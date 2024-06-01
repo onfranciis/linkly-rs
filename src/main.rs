@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate rocket;
+extern crate mongodb;
+use dotenv::dotenv;
 
 mod catchers;
 mod controllers;
@@ -7,6 +9,8 @@ mod util;
 
 #[launch]
 fn rocket() -> _ {
+    dotenv().ok(); // Load .env file
+
     rocket::build()
         .mount(
             "/",

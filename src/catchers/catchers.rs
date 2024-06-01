@@ -1,7 +1,7 @@
 use rocket::{serde::json::Json, Request};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Clone)] // Derive Serialize for IURL
+#[derive(Serialize, Clone, Deserialize, Debug)] // Derive Serialize for IURL
 pub struct IBaseResponse<T = String> {
     pub result: Option<T>,
     pub err: Option<String>,

@@ -1,30 +1,68 @@
-use rocket::serde::json::Json;
-use serde::Serialize;
-use uuid::Uuid;
+use std::option::IntoIter;
 
-use crate::{catchers::catchers::IBaseResponse, util::shortest::get_shortest_value};
+use rocket::{http::Status, serde::json::Json};
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)] // Derive Serialize for IURL
+use crate::catchers::catchers::IBaseResponse;
+use mongodb::{bson::doc, Client, Collection, Cursor};
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct IURL {
     id: String,
     url: String,
     short: String,
+    date: Option<String>,
 }
-
 #[get("/url")]
-pub fn index() -> Json<IBaseResponse<self::IURL>> {
-    let id: String = String::from(Uuid::new_v4());
-    let uuid_array: Vec<&str> = id.split("-").collect::<Vec<&str>>();
-    let short: String = get_shortest_value(uuid_array).to_string();
-
-    let formatted_data: IBaseResponse<self::IURL> = IBaseResponse::<self::IURL> {
-        err: None,
-        result: Some(self::IURL {
-            id: id.to_string(),
-            url: String::from("www.onfranciis.dev"),
-            short,
-        }),
+pub async fn index() -> Result<(Status, Json<IBaseResponse>), (Status, Json<IBaseResponse>)> {
+    let connection_error: IBaseResponse = IBaseResponse {
+        err: Some(String::from(
+            "Invalid MongoDB connection string! Update your .env",
+        )),
+        result: None,
     };
 
-    Json(formatted_data)
+    let mongodb_url = match std::env::var("MONGODB_URL") {
+        Ok(url) => url,
+        Err(_err) => {
+            return Err((Status::BadRequest, Json(connection_error)));
+        }
+    };
+
+    let client = match Client::with_uri_str(mongodb_url).await {
+        Ok(client) => client,
+        Err(err) => {
+            println!("Error creating MongoDB client: {:?}", err);
+            return Err((Status::BadRequest, Json(connection_error)));
+        }
+    };
+
+    let url_collection: Collection<IURL> = client.database("linkly").collection("url");
+
+    async fn proceed(
+        url_collection: Collection<IURL>,
+    ) -> Result<(Status, Json<IBaseResponse>), (Status, Json<IBaseResponse>)> {
+        let cursor = match url_collection.find(doc! {"url":"google.com"}, None).await {
+            Ok(result) => result,
+            Err(err) => {
+                print!("{:?}", (*err.kind));
+                return Err((
+                    Status::BadRequest,
+                    Json(IBaseResponse {
+                        err: Some(String::from("*err.kind")),
+                        result: None,
+                    }),
+                ));
+            }
+        };
+
+        let pre_response: IBaseResponse = IBaseResponse {
+            err: None,
+            result: Some(String::from("Hi")),
+        };
+
+        return Ok((Status::Accepted, Json(pre_response)));
+    }
+
+    proceed(url_collection).await
 }

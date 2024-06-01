@@ -1,0 +1,1 @@
+I need help with my mobile app. I can't create a profile (it says the profile already exists). I can't reset password because it says I'm on a new device. I can't change device because it says I don't exist
