@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate rocket;
-extern crate mongodb;
 use dotenv::dotenv;
 
 mod catchers;
@@ -17,7 +16,8 @@ fn rocket() -> _ {
             routes![
                 catchers::catchers::index,
                 controllers::get_all_url::index,
-                controllers::add_new_url::index
+                controllers::add_new_url::index,
+                controllers::get_single_url::index
             ],
         )
         .register(

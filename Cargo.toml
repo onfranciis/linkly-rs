@@ -3,6 +3,7 @@ name = "linkly"
 version = "0.1.0"
 edition = "2021"
 
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -10,11 +11,10 @@ rocket = { version = "0.5.0", features = ["json"] }
 serde = "1.0.188"
 futures = "0.3.28"
 tokio = { version = "1.32.0", features = ["full"] }
-bson = { version = "2", features = [
-    "chrono-0_4",
-] } # Needed for using chrono datetime in doc
-chrono = "0.4" # Used for setting DateTimes
+chrono = "0.4"                                                                  # Used for setting DateTimes
 dotenv = "0.15.0"
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls"] }
+regex = "1"
 
 [dependencies.uuid]
 version = "1.8.0"
@@ -24,6 +24,6 @@ features = [
     "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
 ]
 
-[dependencies.mongodb]
-version = "2.8.2"
-features = ["tokio-runtime"]
+[dependencies.rocket_db_pools]
+version = "0.2.0"
+features = ["sqlx_postgres"]
