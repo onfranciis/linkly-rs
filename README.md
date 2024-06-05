@@ -21,6 +21,7 @@ $ cargo run
 This service offers 4 end points
 
 - **GET** /
+  <br>
   This is a health check end point.
 
   <br>
@@ -37,6 +38,7 @@ This service offers 4 end points
   <br>
 
 - **POST** /url
+  <br>
   Add new url
 
   <br>
@@ -78,6 +80,7 @@ This service offers 4 end points
   <br>
 
 - **GET** /url/{id}
+  <br>
   Redirect if successful
 
   <br>
@@ -93,6 +96,7 @@ This service offers 4 end points
   ```
 
 - **GET** /url
+  <br>
   Return all urls
 
   <br>
