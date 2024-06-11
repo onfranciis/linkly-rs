@@ -8,6 +8,13 @@ pub struct IURL {
     pub date: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct OptionalIURL {
+    pub long: Option<String>,
+    pub short: Option<String>,
+    pub date: Option<String>,
+}
+
 pub fn instantiate_table_query() -> &'static str {
     r#"
         CREATE TABLE IF NOT EXISTS url (
