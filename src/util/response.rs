@@ -66,3 +66,17 @@ pub fn invalid_short() -> IBaseResponse {
         result: None,
     }
 }
+
+pub fn redis_500() -> IBaseResponse {
+    IBaseResponse {
+        err: Some(String::from("Something went wrong with redis!")),
+        result: None,
+    }
+}
+
+pub fn serialisation_error() -> IBaseResponse {
+    IBaseResponse {
+        err: Some(String::from("There was an error while serialising!")),
+        result: None,
+    }
+}
