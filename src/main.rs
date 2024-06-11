@@ -1,16 +1,22 @@
 #[macro_use]
 extern crate rocket;
 use dotenv::dotenv;
+use rocket_db_pools::{deadpool_redis, Database};
 
 mod catchers;
 mod controllers;
 mod util;
+
+#[derive(Database)]
+#[database("redis_pool")]
+pub struct RedisPool(deadpool_redis::Pool);
 
 #[launch]
 fn rocket() -> _ {
     dotenv().ok(); // Load .env file
 
     rocket::build()
+        .attach(RedisPool::init())
         .mount(
             "/",
             routes![
