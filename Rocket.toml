@@ -1,2 +1,0 @@
-[default.databases.redis_pool]
-url = "redis://localhost:6379"

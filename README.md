@@ -2,7 +2,7 @@
 
 ### Bitly, but on rust
 
-Linkly RS is a url shortner service built on Rust using the [Rocket](https://rocket.rs/) web server framework and PostgreSQL database. It's easy to host, just have the [rust tool chain](https://www.rust-lang.org/tools/install) installed on your system and an env file with the configuration below.
+Linkly RS is a url shortner service built on Rust using the [Rocket](https://rocket.rs/) web server framework, Redis and PostgreSQL database. It's easy to host, just have the [rust tool chain](https://www.rust-lang.org/tools/install) installed on your system and an env file with the configuration below.
 
 ```bash
 DATABASE_URL = "postgres://<username>:<password>@<url>/linkly_rs"
@@ -132,6 +132,6 @@ This service offers 4 end points
 
 <br>
 
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) ![VS Code Insiders](https://img.shields.io/badge/VS%20Code%20Insiders-35b393.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) ![VS Code Insiders](https://img.shields.io/badge/VS%20Code%20Insiders-35b393.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white) ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 For support and enquiries, reach out via [hello@onfranciis.dev](mailto:hello@onfranciis.dev)

@@ -38,3 +38,15 @@ pub fn something_went_wrong(_req: &Request) -> Json<IBaseResponse> {
 
     Json(response)
 }
+
+#[catch(503)]
+pub fn service_unavailable(_req: &Request) -> Json<IBaseResponse> {
+    let response: IBaseResponse = IBaseResponse {
+        err: Some(String::from(
+            "This service is currently unavailable (Check your configuration)",
+        )),
+        result: None,
+    };
+
+    Json(response)
+}

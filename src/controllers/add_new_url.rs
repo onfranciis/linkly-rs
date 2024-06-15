@@ -1,14 +1,14 @@
 use crate::{
     catchers::catchers::IBaseResponse,
     util::{
-        other::{instantiate_table_query, OptionalIURL, IURL},
+        other::{OptionalIURL, IURL},
         response::{
-            connection_error, create_table_error, insert_conflict, insert_failure,
-            invalid_form_data, response_success, serialisation_error,
+            insert_conflict, insert_failure, invalid_form_data, response_success,
+            serialisation_error,
         },
         shortest::get_shortest_value,
     },
-    RedisPool,
+    PgPool, RedisPool,
 };
 use chrono::{FixedOffset, Utc};
 use regex::Regex;
@@ -18,7 +18,6 @@ use rocket::{
     serde::json::{to_string, Json},
 };
 use rocket_db_pools::{deadpool_redis::redis::AsyncCommands, Connection};
-use sqlx::postgres::PgPoolOptions;
 use uuid::Uuid;
 
 #[derive(FromForm)]
@@ -29,40 +28,15 @@ pub struct IBody {
 #[post("/url", data = "<body>")]
 pub async fn index(
     mut redis: Connection<RedisPool>,
+    pg: &PgPool,
     body: Option<Form<IBody>>,
 ) -> Result<(Status, Json<IBaseResponse<OptionalIURL>>), (Status, Json<IBaseResponse>)> {
-    let pg_url = match std::env::var("DATABASE_URL") {
-        Ok(url) => url,
-        Err(_err) => {
-            return Err((Status::BadRequest, Json(connection_error())));
-        }
-    };
-
     let data = match body {
         None => return Err((Status::BadRequest, Json(invalid_form_data()))),
         Some(data) => data,
     };
 
-    let pool = match PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&pg_url)
-        .await
-    {
-        Ok(data) => data,
-        Err(err) => {
-            print!("{:?}", err);
-            return Err((Status::BadRequest, Json(connection_error())));
-        }
-    };
-
-    // Create a table
-    match sqlx::query(&instantiate_table_query()).execute(&pool).await {
-        Ok(_data) => (),
-        Err(_err) => {
-            return Err((Status::BadRequest, Json(create_table_error())));
-        }
-    };
-
+    // Prepend the url with 'http' if it doesn't start with it
     let regexp = Regex::new(r"^https?://").unwrap();
     let mut url = String::from(&data.url.clone());
     if !regexp.is_match(&url) {
@@ -83,7 +57,7 @@ pub async fn index(
         "#,
         url
     )
-    .fetch_all(&pool)
+    .fetch_all(&**pg)
     .await
     {
         Ok(data) => {
@@ -128,7 +102,7 @@ pub async fn index(
         url,
         curr_time
     )
-    .fetch_all(&pool)
+    .fetch_all(&**pg)
     .await
     {
         Ok(data) => {

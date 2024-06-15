@@ -2,22 +2,6 @@ use crate::catchers::catchers::IBaseResponse;
 
 use super::other::IURL;
 
-pub fn connection_error() -> IBaseResponse {
-    IBaseResponse {
-        err: Some(String::from(
-            "Invalid postgres connection string! Update your .env",
-        )),
-        result: None,
-    }
-}
-
-pub fn create_table_error() -> IBaseResponse {
-    IBaseResponse {
-        err: Some(String::from("Could not create DB table!")),
-        result: None,
-    }
-}
-
 pub fn response_success<T>(result: T) -> IBaseResponse<T> {
     IBaseResponse {
         err: None,
