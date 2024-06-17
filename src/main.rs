@@ -8,18 +8,23 @@ mod controllers;
 mod util;
 
 #[derive(Database)]
-#[database("redis_pool")]
+#[database("redis")]
 pub struct RedisPool(deadpool_redis::Pool);
 
 #[derive(Database)]
-#[database("pg_pool")]
+#[database("pg")]
 pub struct PgPool(sqlx::PgPool);
 
 #[launch]
 async fn rocket() -> _ {
-    let pg_pool: sqlx::Pool<sqlx::Postgres> = setup().await;
+    let (redis_url, pg_url, pg_pool) = setup().await;
 
-    rocket::build()
+    let figment = rocket::Config::figment()
+        .merge(("databases.redis.url", redis_url))
+        .merge(("databases.pg.url", pg_url));
+
+    // Use custom with figment instead of build() to bind pg and redis pool to env
+    rocket::custom(figment)
         .attach(RedisPool::init())
         .attach(PgPool::init())
         .manage(pg_pool)

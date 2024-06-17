@@ -11,12 +11,15 @@ rocket = { version = "0.5.1", features = ["json"] }
 serde = "1.0.188"
 futures = "0.3.28"
 tokio = { version = "1.32.0", features = ["full"] }
-chrono = "0.4"                                                                  # Used for setting DateTimes
+chrono = "0.4"
 dotenv = "0.15.0"
-sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls", "macros"] }
 regex = "1"
 redis = "0.8.0"
 deadpool-redis = "0.10"
+
+[dependencies.sqlx]
+version = "0.7"
+features = ["postgres", "runtime-tokio-native-tls", "macros"]
 
 [dependencies.uuid]
 version = "1.8.0"

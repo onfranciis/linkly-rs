@@ -25,19 +25,19 @@ pub struct IURLWithoutID {
     pub date: String,
 }
 
-pub async fn setup() -> sqlx::Pool<Postgres> {
+pub async fn setup() -> (String, String, sqlx::Pool<Postgres>) {
     dotenv().ok(); // Load .env file
 
-    env::var("ROCKET_DATABASES")
-        .expect("The 'ROCKET_DATABASES' variable was not found in this environment!");
+    let redis_url =
+        env::var("REDIS_URL").expect("The 'REDIS_URL' variable was not found in this environment!");
 
-    // Initialize PostgreSQL connection pool
-    let database_url = env::var("DATABASE_URL")
+    let pg_url = env::var("DATABASE_URL")
         .expect("The 'DATABASE_URL' variable was not found in this environment!");
 
+    // Initialize PostgreSQL connection pool
     let pg_pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect(&database_url)
+        .connect(&pg_url)
         .await
         .expect("Failed to create pool.");
 
@@ -56,5 +56,5 @@ pub async fn setup() -> sqlx::Pool<Postgres> {
     .await
     .expect("Something went wrong while instantiating the database!");
 
-    pg_pool
+    (redis_url, pg_url, pg_pool)
 }

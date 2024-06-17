@@ -5,7 +5,15 @@
 Linkly RS is a url shortner service built on Rust using the [Rocket](https://rocket.rs/) web server framework, Redis and PostgreSQL database. It's easy to host, just have the [rust tool chain](https://www.rust-lang.org/tools/install) installed on your system and an env file with the configuration below.
 
 ```bash
-DATABASE_URL = "postgres://<username>:<password>@<url>/linkly_rs"
+ROCKET_PORT=1234
+REDIS_URL=redis://<url>
+DATABASE_URL=postgres://<username>:<password>@<url>/linkly_rs
+
+# NOTE
+# - There must always be DATABASE_URL because that's what sqlx uses to query macros online
+# - You MIGHT run into docker issues if your env file has space and/or quotes
+
+
 ```
 
 <br>
