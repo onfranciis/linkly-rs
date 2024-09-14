@@ -14,7 +14,7 @@ tokio = { version = "1.32.0", features = ["full"] }
 chrono = "0.4"
 dotenv = "0.15.0"
 regex = "1"
-redis = "0.8.0"
+redis = { version = "0.27.0", features = ["tokio-comp"] }
 deadpool-redis = "0.10"
 
 [dependencies.sqlx]
