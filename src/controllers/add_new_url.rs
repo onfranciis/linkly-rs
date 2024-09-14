@@ -1,7 +1,7 @@
 use crate::{
     catchers::catchers::IBaseResponse,
     util::{
-        other::{OptionalIURL, IURL},
+        other::{current_time, OptionalIURL, IURL},
         response::{
             insert_conflict, insert_failure, invalid_form_data, response_success,
             serialisation_error,
@@ -10,7 +10,6 @@ use crate::{
     },
     PgPool, RedisPool,
 };
-use chrono::{FixedOffset, Utc};
 use regex::Regex;
 use rocket::{
     form::Form,
@@ -39,13 +38,14 @@ pub async fn index(
     // Prepend the url with 'http' if it doesn't start with it
     let regexp = Regex::new(r"^https?://").unwrap();
     let mut url = String::from(&data.url.clone());
-    if !regexp.is_match(&url) {
-        url = format!("http://{}", &url);
-    }
 
     // Throw 400 if url attribute of body object does not exists
     if url.trim().is_empty() {
         return Err((Status::BadRequest, Json(invalid_form_data())));
+    }
+
+    if !regexp.is_match(&url) {
+        url = format!("http://{}", &url);
     }
 
     // Check if it already exists
@@ -76,13 +76,7 @@ pub async fn index(
     let id: String = String::from(Uuid::new_v4());
     let uuid_array: Vec<&str> = id.split("-").collect::<Vec<&str>>();
     let short: String = get_shortest_value(uuid_array).to_string();
-
-    // Add offset to make it GMT+1 i.e UTC+1
-    let offset = FixedOffset::east_opt(1 * 60 * 60).unwrap();
-    let curr_time = Utc::now()
-        .with_timezone(&offset)
-        .format("%d %b-%Y %H:%M:%S%P %z")
-        .to_string();
+    let curr_time = current_time();
 
     // Insert a new url and return all the urls
     let rows = match sqlx::query_as!(
