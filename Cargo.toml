@@ -2,6 +2,10 @@
 name = "linkly"
 version = "0.1.0"
 edition = "2021"
+description = "A URL shortener service built with Rust, Rocket, Redis, and PostgreSQL."
+license-file = "COPYING.txt"
+repository = "https://github.com/onfranciis/linkly-rs"
+readme = "README.md"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
