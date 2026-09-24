@@ -20,6 +20,9 @@ dotenv = "0.15.0"
 regex = "1"
 redis = { version = "0.27.0", features = ["tokio-comp"] }
 deadpool-redis = "0.10"
+log = "0.4"
+env_logger = "0.11"
+
 
 [dependencies.sqlx]
 version = "0.7"

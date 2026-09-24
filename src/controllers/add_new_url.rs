@@ -61,7 +61,7 @@ pub async fn index(
     .await
     {
         Ok(data) => {
-            print!("{:?}", data);
+            log::debug!("Queried existing url records for '{}': {:?}", url, data);
 
             // Throw 409 if it already exists
             if data.len() > 0 {
@@ -100,10 +100,11 @@ pub async fn index(
     .await
     {
         Ok(data) => {
-            print!("{:?}", data);
+            log::debug!("Inserted url row and fetched all urls: {:?}", data);
             data.clone()
         }
         Err(_err) => {
+            log::error!("Database insert failure for url '{}': {:?}", url, _err);
             return Err((Status::BadRequest, Json(insert_failure())));
         }
     };
@@ -119,13 +120,14 @@ pub async fn index(
     > {
         match to_string(&rows) {
             Ok(data) => Ok(data),
-            Err(_) => {
-                println!(
-                    "Something went wrong while trying to serialise {:?} to redis",
-                    &rows
+            Err(err) => {
+                log::error!(
+                    "Something went wrong while trying to serialise {:?} to redis: {:?}",
+                    &rows,
+                    err
                 );
 
-                return Err((Status::BadRequest, Json(serialisation_error())));
+                Err((Status::BadRequest, Json(serialisation_error())))
             }
         }
     }
@@ -141,13 +143,14 @@ pub async fn index(
     > {
         match to_string(&rows) {
             Ok(data) => Ok(data),
-            Err(_) => {
-                println!(
-                    "Something went wrong while trying to serialise {:?} to redis",
-                    &rows
+            Err(err) => {
+                log::error!(
+                    "Something went wrong while trying to serialise {:?} to redis: {:?}",
+                    &rows,
+                    err
                 );
 
-                return Err((Status::BadRequest, Json(serialisation_error())));
+                Err((Status::BadRequest, Json(serialisation_error())))
             }
         }
     }
@@ -177,10 +180,11 @@ pub async fn index(
                     Json::<IBaseResponse<OptionalIURL>>(response_success(individual_url_struct)),
                 )),
 
-                Err(_) => {
-                    println!(
-                        "Something went wrong while trying to add {:?} to redis",
-                        rows
+                Err(err) => {
+                    log::error!(
+                        "Something went wrong while trying to add {:?} to redis: {:?}",
+                        rows,
+                        err
                     );
 
                     Err((Status::BadRequest, Json(insert_failure())))
@@ -188,10 +192,11 @@ pub async fn index(
             }
         }
 
-        Err(_) => {
-            println!(
-                "Something went wrong while trying to add {:?} to redis",
-                rows
+        Err(err) => {
+            log::error!(
+                "Something went wrong while trying to add {:?} to redis: {:?}",
+                rows,
+                err
             );
 
             Err((Status::BadRequest, Json(insert_failure())))

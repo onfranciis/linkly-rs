@@ -17,6 +17,9 @@ pub struct PgPool(sqlx::PgPool);
 
 #[launch]
 async fn rocket() -> _ {
+    let _ = env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .try_init();
+
     let (redis_url, pg_url, pg_pool) = setup().await;
 
     let figment = rocket::Config::figment()

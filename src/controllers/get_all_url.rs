@@ -28,20 +28,18 @@ pub async fn index(
 
             // Throw 400 if it failed to be 'serialised'
             Err(err) => {
-                print!("{:?}", err);
-                return Err((Status::BadRequest, Json(serialisation_error())));
+                log::error!("Failed to deserialize 'urls' from redis: {:?}", err);
+                Err((Status::BadRequest, Json(serialisation_error())))
             }
         },
 
         // Throw 400 if it returned null
-        Ok(None) => {
-            return Err((Status::BadRequest, Json(get_query_failure())));
-        }
+        Ok(None) => Err((Status::BadRequest, Json(get_query_failure()))),
 
         // Throw 500 if there's a redis connection problem
         Err(err) => {
-            print!("{:?}", err);
-            return Err((Status::InternalServerError, Json(redis_500())));
+            log::error!("Redis connection error while fetching 'urls': {:?}", err);
+            Err((Status::InternalServerError, Json(redis_500())))
         }
     }
 }
