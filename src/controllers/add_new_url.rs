@@ -24,6 +24,22 @@ pub struct IBody {
     url: String,
 }
 
+/// Validates and normalizes the input URL.
+/// Returns None if the URL is empty or consists solely of whitespace.
+/// Prepends 'http://' if the URL does not start with 'http://' or 'https://'.
+pub fn normalize_url(raw_url: &str) -> Option<String> {
+    if raw_url.trim().is_empty() {
+        return None;
+    }
+
+    let regexp = Regex::new(r"^https?://").unwrap();
+    if !regexp.is_match(raw_url) {
+        Some(format!("http://{}", raw_url))
+    } else {
+        Some(raw_url.to_string())
+    }
+}
+
 #[post("/url", data = "<body>")]
 pub async fn index(
     mut redis: Connection<RedisPool>,
@@ -35,18 +51,10 @@ pub async fn index(
         Some(data) => data,
     };
 
-    // Prepend the url with 'http' if it doesn't start with it
-    let regexp = Regex::new(r"^https?://").unwrap();
-    let mut url = String::from(&data.url.clone());
-
-    // Throw 400 if url attribute of body object does not exists
-    if url.trim().is_empty() {
-        return Err((Status::BadRequest, Json(invalid_form_data())));
-    }
-
-    if !regexp.is_match(&url) {
-        url = format!("http://{}", &url);
-    }
+    let url = match normalize_url(&data.url) {
+        Some(u) => u,
+        None => return Err((Status::BadRequest, Json(invalid_form_data()))),
+    };
 
     // Check if it already exists
     match sqlx::query_as!(
@@ -196,5 +204,53 @@ pub async fn index(
 
             Err((Status::BadRequest, Json(insert_failure())))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_url_empty_or_whitespace() {
+        assert_eq!(normalize_url(""), None);
+        assert_eq!(normalize_url("   "), None);
+        assert_eq!(normalize_url("\t\n"), None);
+    }
+
+    #[test]
+    fn test_normalize_url_without_scheme() {
+        assert_eq!(
+            normalize_url("example.com"),
+            Some(String::from("http://example.com"))
+        );
+        assert_eq!(
+            normalize_url("sub.domain.org/path?param=1"),
+            Some(String::from("http://sub.domain.org/path?param=1"))
+        );
+    }
+
+    #[test]
+    fn test_normalize_url_with_http() {
+        assert_eq!(
+            normalize_url("http://example.com"),
+            Some(String::from("http://example.com"))
+        );
+        assert_eq!(
+            normalize_url("http://example.com/test"),
+            Some(String::from("http://example.com/test"))
+        );
+    }
+
+    #[test]
+    fn test_normalize_url_with_https() {
+        assert_eq!(
+            normalize_url("https://example.com"),
+            Some(String::from("https://example.com"))
+        );
+        assert_eq!(
+            normalize_url("https://github.com/onfranciis/linkly-rs"),
+            Some(String::from("https://github.com/onfranciis/linkly-rs"))
+        );
     }
 }

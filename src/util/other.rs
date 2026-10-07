@@ -122,3 +122,20 @@ pub async fn setup_redis(redis_url: &String) -> () {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_current_time_format() {
+        let time_str = current_time();
+        assert!(!time_str.is_empty());
+        // Timezone offset for GMT+1 should be +0100
+        assert!(
+            time_str.ends_with("+0100"),
+            "Expected timestamp to end with +0100 timezone, got: {}",
+            time_str
+        );
+    }
+}
