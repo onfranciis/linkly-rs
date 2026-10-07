@@ -91,7 +91,7 @@ pub async fn setup_redis(redis_url: &String) -> () {
         Ok(None) => {
             // If it doesn't exist? Create urls key and attatch demo data to it
             match conn.set::<&str, String, String>("urls", to_string(&demo_data).unwrap()) {
-                Ok(_) => println!("Instantiated redis with {:?}", &demo_data),
+                Ok(_) => log::info!("Instantiated redis with {:?}", &demo_data),
 
                 Err(_) => {
                     panic!(
@@ -109,9 +109,10 @@ pub async fn setup_redis(redis_url: &String) -> () {
 
     // Set demo key to match demo data
     match conn.set::<&str, String, String>("demo", to_string(&demo_data[0]).unwrap()) {
-        Ok(_) => println!(
+        Ok(_) => log::info!(
             "Added {:?} to redis with key {:?}",
-            &demo_data[0], &demo_key
+            &demo_data[0],
+            &demo_key
         ),
 
         Err(_) => {

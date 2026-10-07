@@ -28,20 +28,26 @@ pub async fn index(
 
             // Throw 400 if it fails to serialise it like IURLWithoutID
             Err(err) => {
-                print!("{:?}", err);
-                return Err((Status::BadRequest, Json(serialisation_error())));
+                log::error!(
+                    "Failed to deserialize URL for short '{}' from redis: {:?}",
+                    short,
+                    err
+                );
+                Err((Status::BadRequest, Json(serialisation_error())))
             }
         },
 
         // Throw 404 if it doesn't exist
-        Ok(None) => {
-            return Err((Status::NotFound, Json(invalid_short())));
-        }
+        Ok(None) => Err((Status::NotFound, Json(invalid_short()))),
 
         // Throw 500 if there's a redis error
         Err(err) => {
-            print!("{:?}", err);
-            return Err((Status::InternalServerError, Json(redis_500())));
+            log::error!(
+                "Redis connection error while fetching short '{}': {:?}",
+                short,
+                err
+            );
+            Err((Status::InternalServerError, Json(redis_500())))
         }
     }
 }
